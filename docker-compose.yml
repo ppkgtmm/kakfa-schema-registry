@@ -86,13 +86,16 @@ services:
       SCHEMA_REGISTRY_HOST_NAME: schema-registry
       SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'kafka1:29092,kafka2:29092,kafka3:29092'
       SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
+      SCHEMA_REGISTRY_OPTS: -Djava.security.auth.login.config=/etc/schema-registry/kafka_client_jaas.conf
     env_file:
       - .env
     command:
       - sh
       - -c
       - |
-        echo 'sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required \
-        username="client" \
-        password="${USER_CLIENT}";' >> /etc/schema-registry/schema-registry.properties
+        echo 'KafkaClient {
+          org.apache.kafka.common.security.plain.PlainLoginModule required
+          username="client"
+          password="${USER_CLIENT}";
+        };' > /etc/schema-registry/kafka_client_jaas.conf
         /etc/confluent/docker/run

@@ -74,3 +74,25 @@ services:
       KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: PLAIN
       KAFKA_OPTS: -Djava.security.auth.login.config=/etc/kafka/kafka_server_jaas.conf
     <<: *kafka-common
+  schema-registry:
+    image: confluentinc/cp-schema-registry:7.5.2
+    container_name: schema-registry
+    depends_on:
+      - kafka1
+      - kafka2
+      - kafka3
+    ports: [ "8081:8081" ]
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'kafka1:29092,kafka2:29092,kafka3:29092'
+      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
+    env_file:
+      - .env
+    command:
+      - sh
+      - -c
+      - |
+        echo 'sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required \
+        username="client" \
+        password="${USER_CLIENT}";' >> /etc/schema-registry/schema-registry.properties
+        /etc/confluent/docker/run

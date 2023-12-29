@@ -4,9 +4,12 @@ mkdir -p $PWD/secrets
 CNF_DIR=$PWD/config
 SC_DIR=$PWD/secrets
 CA_CNF=$CNF_DIR/ca.cnf
-CA_KEY=$SC_DIR/ca.key
-CA_CERT=$SC_DIR/ca.crt
-CA_PEM=$SC_DIR/ca.pem
+CA_KEY=$SC_DIR/ca/ca.key
+CA_CERT=$SC_DIR/ca/ca.crt
+CA_PEM=$SC_DIR/ca/ca.pem
+
+# create ca folder if not exists
+mkdir -p $SC_DIR/ca
 
 # gen certification authority key and certificate
 openssl req -new -nodes -x509 -days 365 -newkey rsa:2048 \
@@ -23,6 +26,7 @@ source .env
 # for each broker
 for BROKER in $BROKER1 $BROKER2 $BROKER3
 do
+   mkdir -p $SC_DIR/$BROKER/ # create broker folder if not exists
    # gen config file from template
    echo "[req]
 prompt = no
@@ -57,25 +61,25 @@ DNS.2=$BROKER-external
 DNS.3=localhost" > $CNF_DIR/$BROKER.cnf
    # gen broker key and cert
    openssl req -new -newkey rsa:2048 -nodes \
-   -keyout $SC_DIR/$BROKER.key \
-   -out $SC_DIR/$BROKER.csr \
+   -keyout $SC_DIR/$BROKER/$BROKER.key \
+   -out $SC_DIR/$BROKER/$BROKER.csr \
    -config $CNF_DIR/$BROKER.cnf
    # sign broker cert from ca
    openssl x509 -req -days 3650 \
-   -in $SC_DIR/$BROKER.csr \
+   -in $SC_DIR/$BROKER/$BROKER.csr \
    -CA $CA_CERT \
    -CAkey $CA_KEY \
    -CAcreateserial \
-   -out $SC_DIR/$BROKER.crt \
+   -out $SC_DIR/$BROKER/$BROKER.crt \
    -extfile $CNF_DIR/$BROKER.cnf \
    -extensions v3_req
    # convert broker cert to pkcs12 (language neutral) format
    openssl pkcs12 -export \
-   -in $SC_DIR/$BROKER.crt \
-   -inkey $SC_DIR/$BROKER.key \
+   -in $SC_DIR/$BROKER/$BROKER.crt \
+   -inkey $SC_DIR/$BROKER/$BROKER.key \
    -chain \
    -CAfile $CA_PEM \
    -name $BROKER \
-   -out $SC_DIR/$BROKER.p12 \
+   -out $SC_DIR/$BROKER/$BROKER.p12 \
    -password pass:$P12_PASS 
 done

@@ -19,8 +19,6 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,INTERNAL:SASL_PLAINTEXT,EXTERNAL:SASL_PLAINTEXT
       KAFKA_SASL_ENABLED_MECHANISMS: PLAIN
       KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: PLAIN
-      # KAFKA_LISTENER_NAME_INTERNAL_PLAIN_SASL_JAAS_CONFIG: $(cat ./jaas.cnf)
-      # KAFKA_LISTENER_NAME_EXTERNAL_PLAIN_SASL_JAAS_CONFIG: $(cat ./jaas.cnf)
       BROKER: $BROKER1
       KAFKA_SSL_KEYSTORE_FILENAME: kafka.$BROKER1.keystore.pkcs12
       KAFKA_SSL_KEYSTORE_CREDENTIALS: ${BROKER1}_keystore_creds
@@ -28,7 +26,6 @@ services:
     volumes:
       - ./secrets/$BROKER1:/etc/kafka/secrets
       - ./init.sh:/etc/init.sh
-      - ./jaas.cnf:/etc/jaas.cnf
     command:
       - sh 
       - -c
@@ -51,8 +48,6 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,INTERNAL:SASL_PLAINTEXT,EXTERNAL:SASL_PLAINTEXT
       KAFKA_SASL_ENABLED_MECHANISMS: PLAIN
       KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: PLAIN
-      # KAFKA_LISTENER_NAME_INTERNAL_PLAIN_SASL_JAAS_CONFIG: $(cat ./jaas.cnf)
-      # KAFKA_LISTENER_NAME_EXTERNAL_PLAIN_SASL_JAAS_CONFIG: $(cat ./jaas.cnf)
       BROKER: $BROKER2
       KAFKA_SSL_KEYSTORE_FILENAME: kafka.$BROKER2.keystore.pkcs12
       KAFKA_SSL_KEYSTORE_CREDENTIALS: ${BROKER2}_keystore_creds
@@ -60,7 +55,6 @@ services:
     volumes:
       - ./secrets/$BROKER2:/etc/kafka/secrets
       - ./init.sh:/etc/init.sh
-      - ./jaas.cnf:/etc/jaas.cnf
     command:
       - sh 
       - -c
@@ -84,8 +78,6 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,INTERNAL:SASL_PLAINTEXT,EXTERNAL:SASL_PLAINTEXT
       KAFKA_SASL_ENABLED_MECHANISMS: PLAIN
       KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: PLAIN
-      # KAFKA_LISTENER_NAME_INTERNAL_PLAIN_SASL_JAAS_CONFIG: $(cat ./jaas.cnf)
-      # KAFKA_LISTENER_NAME_EXTERNAL_PLAIN_SASL_JAAS_CONFIG: $(cat ./jaas.cnf)
       BROKER: $BROKER3
       KAFKA_SSL_KEYSTORE_FILENAME: kafka.$BROKER3.keystore.pkcs12
       KAFKA_SSL_KEYSTORE_CREDENTIALS: ${BROKER3}_keystore_creds
@@ -93,7 +85,6 @@ services:
     volumes:
       - ./secrets/$BROKER3:/etc/kafka/secrets
       - ./init.sh:/etc/init.sh
-      - ./jaas.cnf:/etc/jaas.cnf
     command:
       - sh 
       - -c
@@ -114,7 +105,10 @@ services:
       SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
       SCHEMA_REGISTRY_KAFKASTORE_SECURITY_PROTOCOL: SASL_PLAINTEXT
       SCHEMA_REGISTRY_KAFKASTORE_SASL_MECHANISM: PLAIN
-      SCHEMA_REGISTRY_KAFKASTORE_SASL_JAAS_CONFIG: $SR_JAAS
+      SCHEMA_REGISTRY_KAFKASTORE_SASL_JAAS_CONFIG: |
+        org.apache.kafka.common.security.plain.PlainLoginModule required \
+        username="client" \
+        password="${USER_CLIENT}";
       # command:
       #   - sh
       #   - -c

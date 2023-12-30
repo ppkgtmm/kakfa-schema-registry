@@ -28,7 +28,7 @@ def delivery_report(err, msg):
 
 def main(data_path: str):
     data = pd.read_csv(data_path)
-    producer = Producer(producer_conf)
+    producer = Producer(kafka_server_conf)
 
     print("Producing user records to topic {}".format(topic))
     for user in data.to_dict(orient="records"):

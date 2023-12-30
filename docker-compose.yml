@@ -17,15 +17,11 @@ services:
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,INTERNAL:SASL_SSL,EXTERNAL:SASL_SSL
-      KAFKA_SASL_ENABLED_MECHANISMS: SSL
-      KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: SSL
       BROKER: $BROKER1
-      KAFKA_SSL_KEYSTORE_FILENAME: kafka.$BROKER1.keystore.pkcs12
-      KAFKA_SSL_KEYSTORE_CREDENTIALS: ${BROKER1}_keystore_creds
-      KAFKA_SSL_KEY_CREDENTIALS: ${BROKER1}_sslkey_creds
     volumes:
       - ./secrets/$BROKER1:/etc/kafka/secrets
-      - ./init.sh:/etc/init.sh
+      - ./init/broker.sh:/etc/init.sh
+      - ./secrets/ca/ca.crt:/etc/ca/ca.crt
     command:
       - sh 
       - -c
@@ -46,15 +42,11 @@ services:
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,INTERNAL:SASL_SSL,EXTERNAL:SASL_SSL
-      KAFKA_SASL_ENABLED_MECHANISMS: SSL
-      KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: SSL
       BROKER: $BROKER2
-      KAFKA_SSL_KEYSTORE_FILENAME: kafka.$BROKER2.keystore.pkcs12
-      KAFKA_SSL_KEYSTORE_CREDENTIALS: ${BROKER2}_keystore_creds
-      KAFKA_SSL_KEY_CREDENTIALS: ${BROKER2}_sslkey_creds
     volumes:
       - ./secrets/$BROKER2:/etc/kafka/secrets
-      - ./init.sh:/etc/init.sh
+      - ./init/broker.sh:/etc/init.sh
+      - ./secrets/ca/ca.crt:/etc/ca/ca.crt
     command:
       - sh 
       - -c
@@ -76,15 +68,11 @@ services:
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,INTERNAL:SASL_SSL,EXTERNAL:SASL_SSL
-      KAFKA_SASL_ENABLED_MECHANISMS: SSL
-      KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: SSL
       BROKER: $BROKER3
-      KAFKA_SSL_KEYSTORE_FILENAME: kafka.$BROKER3.keystore.pkcs12
-      KAFKA_SSL_KEYSTORE_CREDENTIALS: ${BROKER3}_keystore_creds
-      KAFKA_SSL_KEY_CREDENTIALS: ${BROKER3}_sslkey_creds
     volumes:
       - ./secrets/$BROKER3:/etc/kafka/secrets
-      - ./init.sh:/etc/init.sh
+      - ./init/broker.sh:/etc/init.sh
+      - ./secrets/ca/ca.crt:/etc/ca/ca.crt
     command:
       - sh 
       - -c
@@ -104,20 +92,11 @@ services:
       SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: $BROKER1:29092,$BROKER2:29092,$BROKER3:29092 
       SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
       SCHEMA_REGISTRY_KAFKASTORE_SECURITY_PROTOCOL: SASL_SSL
-      SCHEMA_REGISTRY_KAFKASTORE_SASL_MECHANISM: SSL
-      SCHEMA_REGISTRY_KAFKASTORE_SASL_JAAS_CONFIG: |
-        org.apache.kafka.common.security.plain.PlainLoginModule required \
-        username="client" \
-        password="${USER_CLIENT}";
-      # command:
-      #   - sh
-      #   - -c
-      #   - |
-      #     echo 'KafkaClient {
-      #       org.apache.kafka.common.security.plain.PlainLoginModule required
-      #       username="client"
-      #       password="${USER_CLIENT}";
-      #     };' > /etc/schema-registry/kafka_client_jaas.conf
-      #     /etc/confluent/docker/run
-      # SCHEMA_REGISTRY_OPTS: -Djava.security.auth.login.config=/etc/schema-registry/kafka_client_jaas.conf
-
+      SCHEMA_REGISTRY_KAFKASTORE_SASL_MECHANISM: PLAIN
+    volumes:
+      - ./secrets/ca/ca.crt:/etc/ca/ca.crt
+      - ./init/registry.sh:/etc/init.sh
+    command:
+      - sh 
+      - -c
+      - cd /etc/ && ./init.sh

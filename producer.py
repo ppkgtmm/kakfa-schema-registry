@@ -58,7 +58,7 @@ if __name__ == "__main__":
 
     create_topic(topic)
 
-    schema = data_class[arguments.version].avro_schema()
+    schema = get_current_schema(arguments.version)
 
     schema_registry_client = SchemaRegistryClient(schema_registry_conf)
     avro_serializer = AvroSerializer(schema_registry_client, schema)

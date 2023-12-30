@@ -19,11 +19,6 @@ def delivery_report(err, msg):
     if err is not None:
         print("Delivery failed for User record {}: {}".format(value, err))
         return
-    print(
-        "User record {} successfully produced to {} [{}] at offset {}".format(
-            value, msg.topic(), msg.partition(), msg.offset()
-        )
-    )
 
 
 def main(data_path: str):

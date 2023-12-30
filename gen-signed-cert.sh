@@ -7,6 +7,7 @@ CA_CNF=$CNF_DIR/ca.cnf
 CA_KEY=$SC_DIR/ca/ca.key
 CA_CERT=$SC_DIR/ca/ca.crt
 CA_PEM=$SC_DIR/ca/ca.pem
+TRUST_STORE=$SC_DIR/client.truststore.pkcs12
 
 # create ca folder if not exists
 mkdir -p $SC_DIR/ca
@@ -83,3 +84,13 @@ DNS.3=localhost" > $CNF_DIR/$BROKER.cnf
    -out $SC_DIR/$BROKER/$BROKER.p12 \
    -password pass:$P12_PASS 
 done
+
+# create trust store and import ca cert for broker cert verification
+keytool -delete -noprompt -alias CARoot -keystore $TRUST_STORE -storepass $P12_PASS
+keytool -keystore $TRUST_STORE \
+-alias CARoot \
+-import \
+-file $SC_DIR/ca/ca.crt \
+-storepass $P12_PASS  \
+-noprompt \
+-storetype PKCS12

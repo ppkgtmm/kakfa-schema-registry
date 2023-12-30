@@ -1,13 +1,5 @@
-# create secrets folder if not exists
-mkdir -p $PWD/secrets
-
-CNF_DIR=$PWD/config
-SC_DIR=$PWD/secrets
-CA_CNF=$CNF_DIR/ca.cnf
-CA_KEY=$SC_DIR/ca/ca.key
-CA_CERT=$SC_DIR/ca/ca.crt
-CA_PEM=$SC_DIR/ca/ca.pem
-TRUST_STORE=$SC_DIR/client.truststore.pkcs12
+# get env vars from .env file
+source .env
 
 # create ca folder if not exists
 mkdir -p $SC_DIR/ca
@@ -21,15 +13,14 @@ openssl req -new -nodes -x509 -days 365 -newkey rsa:2048 \
 # concat ca cert and key into .pem file
 cat $CA_CERT $CA_KEY > $CA_PEM
 
-# get env vars from .env file
-source .env
-
 # for each broker
 for BROKER in $BROKER1 $BROKER2 $BROKER3
 do
-   mkdir -p $SC_DIR/$BROKER/ # create broker folder if not exists
-   # gen config file from template
-   echo "[req]
+# create broker folder if not exists
+mkdir -p $SC_DIR/$BROKER/
+
+# gen config file from template
+echo "[req]
 prompt = no
 distinguished_name = dn
 default_md = sha256
@@ -60,37 +51,40 @@ subjectAltName = @alt_names
 DNS.1=$BROKER
 DNS.2=$BROKER-external
 DNS.3=localhost" > $CNF_DIR/$BROKER.cnf
-   # gen broker key and cert
-   openssl req -new -newkey rsa:2048 -nodes \
-   -keyout $SC_DIR/$BROKER/$BROKER.key \
-   -out $SC_DIR/$BROKER/$BROKER.csr \
-   -config $CNF_DIR/$BROKER.cnf
-   # sign broker cert from ca
-   openssl x509 -req -days 3650 \
-   -in $SC_DIR/$BROKER/$BROKER.csr \
-   -CA $CA_CERT \
-   -CAkey $CA_KEY \
-   -CAcreateserial \
-   -out $SC_DIR/$BROKER/$BROKER.crt \
-   -extfile $CNF_DIR/$BROKER.cnf \
-   -extensions v3_req
-   # convert broker cert to pkcs12 (language neutral) format
-   openssl pkcs12 -export \
-   -in $SC_DIR/$BROKER/$BROKER.crt \
-   -inkey $SC_DIR/$BROKER/$BROKER.key \
-   -chain \
-   -CAfile $CA_PEM \
-   -name $BROKER \
-   -out $SC_DIR/$BROKER/$BROKER.p12 \
-   -password pass:$P12_PASS 
+
+# gen broker key and cert
+openssl req -new -newkey rsa:2048 -nodes \
+-keyout $SC_DIR/$BROKER/$BROKER.key \
+-out $SC_DIR/$BROKER/$BROKER.csr \
+-config $CNF_DIR/$BROKER.cnf
+
+# sign broker cert from ca
+openssl x509 -req -days 3650 \
+-in $SC_DIR/$BROKER/$BROKER.csr \
+-CA $CA_CERT \
+-CAkey $CA_KEY \
+-CAcreateserial \
+-out $SC_DIR/$BROKER/$BROKER.crt \
+-extfile $CNF_DIR/$BROKER.cnf \
+-extensions v3_req
+
+# convert broker cert to pkcs12 (language neutral) format
+openssl pkcs12 -export \
+-in $SC_DIR/$BROKER/$BROKER.crt \
+-inkey $SC_DIR/$BROKER/$BROKER.key \
+-chain \
+-CAfile $CA_PEM \
+-name $BROKER \
+-out $SC_DIR/$BROKER/$BROKER.p12 \
+-password pass:$P12_PASS
 done
 
 # create trust store and import ca cert for broker cert verification
-keytool -delete -noprompt -alias CARoot -keystore $TRUST_STORE -storepass $P12_PASS
+keytool -delete -noprompt -alias $ALIAS -keystore $TRUST_STORE -storepass $P12_PASS
 keytool -keystore $TRUST_STORE \
--alias CARoot \
+-alias $ALIAS \
 -import \
--file $SC_DIR/ca/ca.crt \
+-file $CA_CERT \
 -storepass $P12_PASS  \
 -noprompt \
 -storetype PKCS12

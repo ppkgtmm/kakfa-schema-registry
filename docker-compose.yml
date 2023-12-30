@@ -19,9 +19,9 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,INTERNAL:SASL_SSL,EXTERNAL:SASL_SSL
       BROKER: $BROKER1
     volumes:
-      - ./secrets/$BROKER1:/etc/kafka/secrets
+      - $SC_DIR/$BROKER1:/etc/kafka/secrets
       - ./init/broker.sh:/etc/init.sh
-      - ./secrets/ca/ca.crt:/etc/ca/ca.crt
+      - $CA_CERT:/etc/ca/ca.crt
     command:
       - sh 
       - -c
@@ -44,9 +44,9 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,INTERNAL:SASL_SSL,EXTERNAL:SASL_SSL
       BROKER: $BROKER2
     volumes:
-      - ./secrets/$BROKER2:/etc/kafka/secrets
+      - $SC_DIR/$BROKER2:/etc/kafka/secrets
       - ./init/broker.sh:/etc/init.sh
-      - ./secrets/ca/ca.crt:/etc/ca/ca.crt
+      - $CA_CERT:/etc/ca/ca.crt
     command:
       - sh 
       - -c
@@ -70,9 +70,9 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,INTERNAL:SASL_SSL,EXTERNAL:SASL_SSL
       BROKER: $BROKER3
     volumes:
-      - ./secrets/$BROKER3:/etc/kafka/secrets
+      - $SC_DIR/$BROKER3:/etc/kafka/secrets
       - ./init/broker.sh:/etc/init.sh
-      - ./secrets/ca/ca.crt:/etc/ca/ca.crt
+      - $CA_CERT:/etc/ca/ca.crt
     command:
       - sh 
       - -c
@@ -94,7 +94,7 @@ services:
       SCHEMA_REGISTRY_KAFKASTORE_SECURITY_PROTOCOL: SASL_SSL
       SCHEMA_REGISTRY_KAFKASTORE_SASL_MECHANISM: PLAIN
     volumes:
-      - ./secrets/ca/ca.crt:/etc/ca/ca.crt
+      - $CA_CERT:/etc/ca/ca.crt
       - ./init/registry.sh:/etc/init.sh
     command:
       - sh 

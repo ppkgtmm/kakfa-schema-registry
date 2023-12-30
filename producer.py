@@ -18,7 +18,6 @@ def delivery_report(err, msg):
     )
     if err is not None:
         print("Delivery failed for User record {}: {}".format(value, err))
-        return
 
 
 def main(data_path: str):

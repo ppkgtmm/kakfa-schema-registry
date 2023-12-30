@@ -47,6 +47,13 @@ class UserV3(AvroModel):
 data_class = {"v1": UserV1, "v2": UserV2, "v3": UserV3}
 
 
+def get_current_schema(version: str):
+    class User(data_class[version]):
+        pass
+
+    return User.avro_schema()
+
+
 def create_topic(topic: str):
     admin = AdminClient(kafka_server_conf)
     topics = admin.list_topics().topics

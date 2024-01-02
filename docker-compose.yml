@@ -94,6 +94,7 @@ services:
       SCHEMA_REGISTRY_LISTENERS: https://0.0.0.0:8081
       SCHEMA_REGISTRY_KAFKASTORE_SECURITY_PROTOCOL: SASL_SSL
       SCHEMA_REGISTRY_KAFKASTORE_SASL_MECHANISM: PLAIN
+      SCHEMA_REGISTRY_INTER_INSTANCE_PROTOCOL: https
     volumes:
       - $CA_CERT:/etc/ca/ca.crt
       - ./init/registry.sh:/etc/init.sh

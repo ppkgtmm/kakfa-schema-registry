@@ -79,7 +79,8 @@ services:
       - cd /etc/ && ./init.sh
   schema-registry:
     image: confluentinc/cp-schema-registry:7.5.2
-    container_name: schema-registry
+    container_name: $SR_HOST
+    hostname: $SR_HOST
     depends_on:
       - broker1
       - broker2

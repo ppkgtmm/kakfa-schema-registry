@@ -1,11 +1,13 @@
 # define var of reuse
 SR_CA=/etc/schema-registry/$SR_HOST.truststore.pkcs12
+SSL_STORE_TYPE=PKCS12
 export SCHEMA_REGISTRY_KAFKASTORE_SSL_TRUSTSTORE_LOCATION=$SR_CA
 export SCHEMA_REGISTRY_KAFKASTORE_SSL_TRUSTSTORE_PASSWORD=$P12_PASS
 export SCHEMA_REGISTRY_KAFKASTORE_SASL_JAAS_CONFIG="org.apache.kafka.common.security.plain.PlainLoginModule required \ username=\"client\" \ password=\"${USER_CLIENT}\";"
 export SCHEMA_REGISTRY_SSL_KEYSTORE_LOCATION=/etc/schema-registry/secrets/$SR_HOST.keystore.pkcs12
 export SCHEMA_REGISTRY_SSL_KEYSTORE_PASSWORD=$P12_PASS
 export SCHEMA_REGISTRY_SSL_KEY_PASSWORD=$P12_PASS
+export SCHEMA_REGISTRY_SSL_TRUSTSTORE_TYPE=$SSL_STORE_TYPE
 export PASSWORD_FILE=/etc/schema-registry/passwd
 export JAAS_CONFIG=/etc/schema-registry/schema-registry.jaas
 

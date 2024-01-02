@@ -6,7 +6,11 @@ from confluent_kafka.admin import AdminClient, NewTopic
 
 load_dotenv()
 
-schema_registry_conf = {"url": "http://localhost:8081"}
+schema_registry_conf = {
+    "url": "https://localhost:8081",
+    "basic.auth.user.info": "client:" + os.environ.get("SR_PASSWORD"),
+    "ssl.ca.location": os.environ.get("CA_CERT"),
+}
 kafka_server_conf = {
     "bootstrap.servers": "localhost:9092,localhost:9093,localhost:9094",
     "security.protocol": "SASL_SSL",

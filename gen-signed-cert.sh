@@ -14,7 +14,7 @@ openssl req -new -nodes -x509 -days 365 -newkey rsa:2048 \
 cat $CA_CERT $CA_KEY > $CA_PEM
 
 # for each broker
-for BROKER in $BROKER1 $BROKER2 $BROKER3
+for BROKER in $BROKER1 $BROKER2 $BROKER3 $SR_HOST
 do
 # create broker folder if not exists
 mkdir -p $SC_DIR/$BROKER/

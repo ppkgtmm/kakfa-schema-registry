@@ -97,6 +97,7 @@ services:
     volumes:
       - $CA_CERT:/etc/ca/ca.crt
       - ./init/registry.sh:/etc/init.sh
+      - $SC_DIR/$SR_HOST:/etc/schema-registry/secrets
     command:
       - sh 
       - -c
